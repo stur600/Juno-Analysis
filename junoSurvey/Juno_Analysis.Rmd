@@ -32,24 +32,28 @@ names(juno_survey) <- lapply(names(juno_survey), gsub, pattern='X', replacement=
 #Long format - for plotting
 juno_survey_long <- juno_survey %>% gather(key, value, -c(1,2)) %>%
   separate(key, c("Year", "Answer"), sep="_")
-
-
-juno_survey_long
-
 ```
 
 Analysis
-
+- Get differences between years
 ```{R}
 vars <- c("A","B","C","D","E") # choose Answer columns
 vars <- setNames(vars, paste0(vars, "_diff")) # create new column names for difference between years
 juno_survey_long %>% group_by(Question_Code, Answer) %>% mutate(diff = value - lag(value)) -> juno_survey_long
-
-juno_survey_long %>% arrange(Question_Code)
+head(juno_survey_long)
 ```
 
 plot all questions.
 This will just show the distributions of answers for each year.
+
+A - embedded
+B - adopted
+C - developing
+D - compliant
+E - not in place
+
+Left skew is good (embedded), right skew is bad (not in place).
+
 ```{R}
 juno_survey_long %>%
   ggplot(aes(x=Answer, y=value, color = Year, group = Year)) + geom_line(size=.5) +
